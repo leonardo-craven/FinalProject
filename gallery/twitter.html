@@ -16,7 +16,8 @@
       src="../Cesium/Cesium.js"
       
     ></script>
-
+    <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css">
+    <script src="https://js.arcgis.com/4.12/"></script>
   </head>
   <body
     class="sandcastle-loading"
@@ -28,6 +29,7 @@
     <div id="cesiumContainer" class="fullSize"></div>
     <div id="loadingOverlay"><h1>Loading...</h1></div>
     <div id="toolbar"></div>
+    <div id="timeSliderDiv"></div>
     <div style="position:absolute;bottom:0;padding:60px 10px;">
       <label style="display:inline-block;padding:10px;background:white;color:black;">#<input style="border:none;background:transparent;outline:none;" id="hashtagInput"></label>
       <button style="display:inline-block;" type="submit">Submit</button>
@@ -442,6 +444,26 @@ let globalAllData=null;
 getAllData().then(data=>{
   globalAllData=data;
   updateMap(data);
+})
+require(["esri/widgets/TimeSlider"], function(TimeSlider) { 
+// Create a time slider for the first decade of the 21st century.
+// Only show content for the 1st year of the decade for all time aware layers.
+var timeSlider = new TimeSlider({
+  container: "timeSliderDiv",
+  mode: "time-window",
+  fullTimeExtent: {
+    start: new Date(2000, 0, 1),
+    end: new Date(2010, 0, 1)
+  },
+  values:[
+    new Date(2000, 0, 1),
+    new Date(2001, 1, 1)
+  ]
+});
+// print the current time extent to the console.
+timeSlider.watch("timeExtent", function(value){
+  console.log("Current time window is: " + value.toJSON());
+});
 })
 if (typeof Cesium !== 'undefined') {
     window.startupCalled = true;
