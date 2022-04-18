@@ -374,25 +374,8 @@ WebGLGlobeDataSource.prototype._setLoading = function (isLoading) {
 
 //Now that we've defined our own DataSource, we can use it to load
 //any JSON data formatted for WebGL Globe.
-const dataSource = new WebGLGlobeDataSource();
-dataSource
-  .loadUrl("../data/all.json")
-  .then(function () {
-    //After the initial load, create buttons to let the user switch among series.
-    function createSeriesSetter(seriesName) {
-      return function () {
-        dataSource.seriesToDisplay = seriesName;
-      };
-    }
+window.dataSource = new WebGLGlobeDataSource();
 
-    for (let i = 0; i < dataSource.seriesNames.length; i++) {
-      const seriesName = dataSource.seriesNames[i];
-      Sandcastle.addToolbarButton(
-        seriesName,
-        createSeriesSetter(seriesName)
-      );
-    }
-  });
 
 //Create a Viewer instances and add the DataSource.
 const viewer = new Cesium.Viewer("cesiumContainer", {
@@ -405,6 +388,61 @@ viewer.dataSources.add(dataSource);
 //Sandcastle_End
     Sandcastle.finishedLoading();
 }
+async function getData(url){
+  const response=await fetch(url);
+  const text=await response.text();
+  const lines=text.split('\n');
+  const data=[];
+  for (let i=0; i<lines.length; i++){
+    if (lines[i].length>0){
+      data.push(JSON.parse(lines[i]));
+    }
+  }
+  return data;
+}
+async function getAllData(){
+  const allData=[]
+  const iota=await getData('../data/iota.jsonl');
+  const kappa=await getData('../data/kappa.jsonl');
+  const lambda=await getData('../data/lambda.jsonl');
+  const mu=await getData('../data/mu.jsonl');
+  const nu=await getData('../data/nu.jsonl');
+  allData.push(...iota);
+  allData.push(...kappa);
+  allData.push(...lambda);
+  allData.push(...mu);
+  allData.push(...nu);
+  return allData;
+}
+function updateMap(data){
+  const coordinates = [];
+  for (let tweet of data){
+    coordinates.push(tweet.coordinates.coordinates);
+  }
+  const heights={};
+  for (let coord of coordinates){
+    const key=Math.round(coord[0])+','+Math.round(coord[1]);
+    if (key in heights){
+      heights[key]+=1;
+    }else{
+      heights[key]=1;
+    }
+  }
+  const outData=[];
+  for (let key of Object.keys(heights)){
+    const fullKey=key.split(",");
+    outData.push(fullKey[1]);
+    outData.push(fullKey[0]);
+    outData.push(heights[key]/1000);
+  }
+  window.dataSource.load([['data',outData]]);
+  return outData;
+}
+let globalAllData=null;
+getAllData().then(data=>{
+  globalAllData=data;
+  updateMap(data);
+})
 if (typeof Cesium !== 'undefined') {
     window.startupCalled = true;
     startup(Cesium);
