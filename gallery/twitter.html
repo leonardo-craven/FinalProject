@@ -380,7 +380,7 @@ window.dataSource = new WebGLGlobeDataSource();
 
 
 // example of hashtag polyline
-//   const redLine = viewer.entities.add({
+// const redLine = hashtagData.entities.add({
 //   name: "Red line on terrain",
 //   polyline: {
 //     positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -125, 35]),
@@ -391,7 +391,15 @@ window.dataSource = new WebGLGlobeDataSource();
 // });
 
   const hashtagData = new Cesium.CustomDataSource("spread of tweets with input hashtag");
-
+  const redLine = hashtagData.entities.add({
+    name: "Red line on terrain",
+    polyline: {
+      positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -125, 35]),
+      width: 5,
+      material: Cesium.Color.RED,
+      clampToGround: true,
+    },
+  });
 
 //Create a Viewer instances and add the DataSource.
 const viewer = new Cesium.Viewer("cesiumContainer", {
@@ -400,6 +408,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 });
 viewer.clock.shouldAnimate = false;
 viewer.dataSources.add(dataSource);
+viewer.dataSources.add(hashtagData)
 
 //Sandcastle_End
     Sandcastle.finishedLoading();
