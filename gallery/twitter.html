@@ -394,6 +394,20 @@ dataSource
     }
   });
 
+// example of hashtag polyline
+//   const redLine = viewer.entities.add({
+//   name: "Red line on terrain",
+//   polyline: {
+//     positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -125, 35]),
+//     width: 5,
+//     material: Cesium.Color.RED,
+//     clampToGround: true,
+//   },
+// });
+
+  const hashtagData = new Cesium.CustomDataSource("spread of tweets with input hashtag");
+
+
 //Create a Viewer instances and add the DataSource.
 const viewer = new Cesium.Viewer("cesiumContainer", {
   animation: false,
