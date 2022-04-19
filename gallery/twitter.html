@@ -390,32 +390,32 @@ window.dataSource = new WebGLGlobeDataSource();
 //   },
 // });
 
-  const hashtagData = new Cesium.CustomDataSource("spread of tweets with input hashtag");
-  const redLine = hashtagData.entities.add({
-    name: "Red line on terrain",
-    polyline: {
-      positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -125, 35]),
-      width: 5,
-      material: Cesium.Color.RED,
-      clampToGround: true,
-    },
-  });
+const hashtagData = new Cesium.CustomDataSource("spread of tweets with input hashtag");
+const redLine = hashtagData.entities.add({
+  name: "Red line on terrain",
+  polyline: {
+    positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -125, 35]),
+    width: 5,
+    material: Cesium.Color.RED,
+    clampToGround: true,
+  },
+});
 
-  function loadHashtagData(hashtagData, data) {
-    hashtagData.entities.removeAll();
-    for (let i = 0; i < data.length - 1; i++) {
-      let lineName = 'Spread of hashtag from tweets ${i+1} to ${i+2}';
-      hashtagData.entities.add({
-        name: lineName,
-        polyline: {
-          positions: Cesium.Cartesian3.fromDegreesArray(data[i][1], data[i][0], data[i+1][1], data[i+1][0]),
-          width: 3,
-          material: Cesium.Color.WHITE,
-          clampToGround: true,
-        },
-      });
-    }
+function loadHashtagData(hashtagData, data){
+  hashtagData.entities.removeAll();
+  for (let i = 0; i < data.length - 1; i++) {
+    let lineName = 'Spread of hashtag from tweets ${i+1} to ${i+2}';
+    hashtagData.entities.add({
+      name: lineName,
+      polyline: {
+        positions: Cesium.Cartesian3.fromDegreesArray(data[i][1], data[i][0], data[i+1][1], data[i+1][0]),
+        width: 3,
+        material: Cesium.Color.WHITE,
+        clampToGround: true,
+      },
+    });
   }
+}
 
 //Create a Viewer instances and add the DataSource.
 const viewer = new Cesium.Viewer("cesiumContainer", {
@@ -490,7 +490,7 @@ function updateMap(data,cache='data',hashtag=null){
     outData.push(heights[key]/max);
   }
   window.dataSource.load([[cache,outData]]);
-  loadHashtagData(hashtagData, hashtagCoords);
+  loadHashtagData(window.hashtagData, hashtagCoords);
   return outData;
 }
 let globalAllData=null;
