@@ -32,7 +32,7 @@
     <div id="timeSliderDiv" style="position:absolute; bottom:0;width:100%;"></div>
     <div style="position:absolute;top:0;padding:10px 10px;">
       <label style="display:inline-block;padding:10px;background:white;color:black;">#<input style="border:none;background:transparent;outline:none;" id="hashtagInput"></label>
-      <button style="display:inline-block;" type="submit">Submit</button>
+      <button style="display:inline-block;" type="submit" id="submitButton">Submit</button>
     </div>
     <script id="cesium_sandcastle_script">
 function startup(Cesium) {
@@ -401,6 +401,22 @@ window.dataSource = new WebGLGlobeDataSource();
     },
   });
 
+  function loadHashtagData(hashtagData, data) {
+    hashtagData.entities.removeAll();
+    for (let i = 0; i < data.length - 1; i++) {
+      let lineName = 'Spread of hashtag from tweets ${i+1} to ${i+2}';
+      hashtagData.entities.add({
+        name: lineName,
+        polyline: {
+          positions: Cesium.Cartesian3.fromDegreesArray(data[i][1], data[i][0], data[i+1][1], data[i+1][0]),
+          width: 3,
+          material: Cesium.Color.WHITE,
+          clampToGround: true,
+        },
+      });
+    }
+  }
+
 //Create a Viewer instances and add the DataSource.
 const viewer = new Cesium.Viewer("cesiumContainer", {
   animation: false,
@@ -408,7 +424,7 @@ const viewer = new Cesium.Viewer("cesiumContainer", {
 });
 viewer.clock.shouldAnimate = false;
 viewer.dataSources.add(dataSource);
-viewer.dataSources.add(hashtagData)
+viewer.dataSources.add(hashtagData);
 
 //Sandcastle_End
     Sandcastle.finishedLoading();
@@ -439,11 +455,18 @@ async function getAllData(){
   allData.push(...nu);
   return allData;
 }
-function updateMap(data,cache='data'){
+function updateMap(data,cache='data',hashtag=null){
   const coordinates = [];
+  const hashtagCoords = [];
   for (let tweet of data){
-    coordinates.push(tweet.coordinates.coordinates);
+    currentCoords = tweet.coordinates.coordinates;
+    coordinates.push(currentCoords);
+    if (hashtag != null && tweet.entities.hashtags.includes(hashtag)) {
+      hashtagCoords.push(currentCoords);
+    }
   }
+  hashtagCoords.reverse();
+
   const heights={};
   for (let coord of coordinates){
     const key=Math.round(coord[0])+','+Math.round(coord[1]);
@@ -467,6 +490,7 @@ function updateMap(data,cache='data'){
     outData.push(heights[key]/max);
   }
   window.dataSource.load([[cache,outData]]);
+  loadHashtagData(hashtagData, hashtagCoords);
   return outData;
 }
 let globalAllData=null;
