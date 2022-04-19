@@ -404,7 +404,7 @@ const redLine = hashtagData.entities.add({
 window.loadHashtagData = function (hashtagData, data){
   hashtagData.entities.removeAll();
   for (let i = 0; i < data.length - 1; i++) {
-    let lineName = 'Spread of hashtag from tweets ${i+1} to ${i+2}';
+    let lineName = `Spread of hashtag from tweets ${i+1} to ${i+2}`;
     let lineColor = new Cesium.Color(0, 0, 0, 0)
     lineColor = Cesium.Color.lerp(Cesium.Color.WHITE, Cesium.Color.RED, i/data.length, lineColor)
     hashtagData.entities.add({
