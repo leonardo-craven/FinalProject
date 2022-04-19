@@ -9,7 +9,7 @@
     />
     <meta name="description" content="A custom DataSource implementation.">
     <meta name="cesium-sandcastle-labels" content="Showcases, DataSources, Tutorials">
-    <title>Cesium Demo</title>
+    <title>Twitter</title>
     <script type="text/javascript" src="../Sandcastle-header.js"></script>
     <script
       type="text/javascript"
@@ -29,8 +29,8 @@
     <div id="cesiumContainer" class="fullSize"></div>
     <div id="loadingOverlay"><h1>Loading...</h1></div>
     <div id="toolbar"></div>
-    <div id="timeSliderDiv"></div>
-    <div style="position:absolute;bottom:0;padding:60px 10px;">
+    <div id="timeSliderDiv" style="position:absolute; bottom:0;width:100%;"></div>
+    <div style="position:absolute;top:0;padding:10px 10px;">
       <label style="display:inline-block;padding:10px;background:white;color:black;">#<input style="border:none;background:transparent;outline:none;" id="hashtagInput"></label>
       <button style="display:inline-block;" type="submit">Submit</button>
     </div>
@@ -439,7 +439,7 @@ async function getAllData(){
   allData.push(...nu);
   return allData;
 }
-function updateMap(data){
+function updateMap(data,cache='data'){
   const coordinates = [];
   for (let tweet of data){
     coordinates.push(tweet.coordinates.coordinates);
@@ -453,20 +453,25 @@ function updateMap(data){
       heights[key]=1;
     }
   }
+  let max=0;
+  for (let key of Object.keys(heights)){
+    if (heights[key]>max){
+      max=heights[key];
+    }
+  }
   const outData=[];
   for (let key of Object.keys(heights)){
     const fullKey=key.split(",");
     outData.push(fullKey[1]);
     outData.push(fullKey[0]);
-    outData.push(heights[key]/1000);
+    outData.push(heights[key]/max);
   }
-  window.dataSource.load([['data',outData]]);
+  window.dataSource.load([[cache,outData]]);
   return outData;
 }
 let globalAllData=null;
 getAllData().then(data=>{
   globalAllData=data;
-  updateMap(data);
 })
 require(["esri/widgets/TimeSlider"], function(TimeSlider) { 
 // Create a time slider for the first decade of the 21st century.
@@ -475,23 +480,33 @@ var timeSlider = new TimeSlider({
   container: "timeSliderDiv",
   mode: "time-window",
   fullTimeExtent: {
-    start: new Date(2000, 0, 1),
-    end: new Date(2010, 0, 1)
+    start: new Date(2019, 9, 17),
+    end: new Date(2020, 1, 4)
   },
-  values:[
-    new Date(2000, 0, 1),
-    new Date(2001, 1, 1)
-  ]
+  stops: {
+    count: 100
+  }
 });
 // print the current time extent to the console.
 timeSlider.watch("timeExtent", function(value){
-  console.log("Current time window is: " + value.toJSON());
+  value=value.toJSON()
+  const data=[];
+  for (let i=0; i<globalAllData.length; i++){
+    const time=new Date(globalAllData[i].created_at).getTime();
+    if (time>value.start && time<value.end){
+      data.push(globalAllData[i]);
+    }
+  }
+  updateMap(data,value.start+","+value.end);
 });
 })
+Cesium.Ion.defaultAccessToken ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjM5OGQ0ZS05MjE4LTQ1ZjQtYTA5OC1iOTFjNGU1NzBjMGUiLCJpZCI6ODkzNDQsImlhdCI6MTY0OTcxMzA0MX0.vngxPOqTrJrVujbnwMdeM_OVliGdVUu5mZXVjhYKuyI";
 if (typeof Cesium !== 'undefined') {
     window.startupCalled = true;
     startup(Cesium);
 }
+// Time slider affects all
+// Hash only affects polylines
 </script>
 </body>
 </html>
