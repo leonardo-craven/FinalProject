@@ -518,6 +518,12 @@ var timeSlider = new TimeSlider({
     count: 100
   }
 });
+
+var currentHashtag = null;
+document.getElementById("submitButton").onclick = function() {
+  currentHashtag = document.getElementById("hashtagInput").value
+}
+
 // print the current time extent to the console.
 timeSlider.watch("timeExtent", function(value){
   value=value.toJSON()
@@ -528,7 +534,7 @@ timeSlider.watch("timeExtent", function(value){
       data.push(globalAllData[i]);
     }
   }
-  updateMap(data,value.start+","+value.end,"coronavirus");
+  updateMap(data,value.start+","+value.end,currentHashtag);
 });
 })
 Cesium.Ion.defaultAccessToken ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjM5OGQ0ZS05MjE4LTQ1ZjQtYTA5OC1iOTFjNGU1NzBjMGUiLCJpZCI6ODkzNDQsImlhdCI6MTY0OTcxMzA0MX0.vngxPOqTrJrVujbnwMdeM_OVliGdVUu5mZXVjhYKuyI";
