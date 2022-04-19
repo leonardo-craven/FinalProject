@@ -405,12 +405,14 @@ window.loadHashtagData = function (hashtagData, data){
   hashtagData.entities.removeAll();
   for (let i = 0; i < data.length - 1; i++) {
     let lineName = 'Spread of hashtag from tweets ${i+1} to ${i+2}';
+    let lineColor = new Cesium.Color(0, 0, 0, 0)
+    lineColor = Cesium.Color.lerp(Cesium.Color.WHITE, Cesium.Color.RED, i/data.length, lineColor)
     hashtagData.entities.add({
       name: lineName,
       polyline: {
-        positions: Cesium.Cartesian3.fromDegreesArray(data[i][1], data[i][0], data[i+1][1], data[i+1][0]),
+        positions: Cesium.Cartesian3.fromDegreesArray([data[i][0], data[i][1], data[i+1][0], data[i+1][1]]),
         width: 3,
-        material: Cesium.Color.WHITE,
+        material: lineColor,
         clampToGround: true,
       },
     });
@@ -455,14 +457,19 @@ async function getAllData(){
   allData.push(...nu);
   return allData;
 }
-function updateMap(data,cache='data',hashtag=null){
+function updateMap(data,cache='data',hashtagInput=null){
   const coordinates = [];
   const hashtagCoords = [];
   for (let tweet of data){
     currentCoords = tweet.coordinates.coordinates;
     coordinates.push(currentCoords);
-    if (hashtag != null && tweet.entities.hashtags.includes(hashtag)) {
-      hashtagCoords.push(currentCoords);
+    if (hashtagInput != null && tweet.entities.hashtags.length != 0) {
+      for (let hashtag of tweet.entities.hashtags) {
+        if (hashtag.text == hashtagInput) {
+          hashtagCoords.push(currentCoords)
+          break
+        } 
+      }
     }
   }
   hashtagCoords.reverse();
@@ -521,7 +528,7 @@ timeSlider.watch("timeExtent", function(value){
       data.push(globalAllData[i]);
     }
   }
-  updateMap(data,value.start+","+value.end);
+  updateMap(data,value.start+","+value.end,"coronavirus");
 });
 })
 Cesium.Ion.defaultAccessToken ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NjM5OGQ0ZS05MjE4LTQ1ZjQtYTA5OC1iOTFjNGU1NzBjMGUiLCJpZCI6ODkzNDQsImlhdCI6MTY0OTcxMzA0MX0.vngxPOqTrJrVujbnwMdeM_OVliGdVUu5mZXVjhYKuyI";
