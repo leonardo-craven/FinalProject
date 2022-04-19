@@ -390,7 +390,7 @@ window.dataSource = new WebGLGlobeDataSource();
 //   },
 // });
 
-const hashtagData = new Cesium.CustomDataSource("spread of tweets with input hashtag");
+window.hashtagData = new Cesium.CustomDataSource("spread of tweets with input hashtag");
 const redLine = hashtagData.entities.add({
   name: "Red line on terrain",
   polyline: {
@@ -401,7 +401,7 @@ const redLine = hashtagData.entities.add({
   },
 });
 
-function loadHashtagData(hashtagData, data){
+window.loadHashtagData = function (hashtagData, data){
   hashtagData.entities.removeAll();
   for (let i = 0; i < data.length - 1; i++) {
     let lineName = 'Spread of hashtag from tweets ${i+1} to ${i+2}';
