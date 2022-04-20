@@ -391,15 +391,6 @@ window.dataSource = new WebGLGlobeDataSource();
 // });
 
 window.hashtagData = new Cesium.CustomDataSource("spread of tweets with input hashtag");
-const redLine = hashtagData.entities.add({
-  name: "Red line on terrain",
-  polyline: {
-    positions: Cesium.Cartesian3.fromDegreesArray([-75, 35, -125, 35]),
-    width: 5,
-    material: Cesium.Color.RED,
-    clampToGround: true,
-  },
-});
 
 window.loadHashtagData = function (hashtagData, data){
   hashtagData.entities.removeAll();
