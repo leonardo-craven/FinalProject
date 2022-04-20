@@ -1,9 +1,12 @@
 # Installation Instructions:
 
 Install nodejs https://nodejs.org/en/  
-next install this package:  
+
+Next, install this package:  
 https://www.npmjs.com/package/serve  
-and then run 'npx serve' in that directory  
+by running `npm i serve` in the project directory  
+
+Then, run the program by running 'npx serve' in the project directory  
 It will launch with port 3000 if available  
 http://localhost:3000/gallery/twitter.html  
 
